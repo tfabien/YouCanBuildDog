@@ -1,57 +1,44 @@
-# Plan de migration
+# Migration Plan
 
-## Stratégie recommandée
+## Objective
 
-Ne pas réécrire la cinématique au début.  
-Le plus sûr consiste à **conserver la logique métier** du sketch d'origine et à remplacer progressivement l'IHM et la plateforme.
+Preserve the original robot behavior while replacing the physical buttons with a touch interface designed for children.
 
-## Étape 1 — Porter le contrôle servo
+## Step 1 — Servo proof of concept
+- boot ESP32
+- attach the servos
+- reproduce a simple move
+- verify power stability
 
-- remplacer la lib Arduino Uno par une lib ESP32 compatible servo
-- garder le pilotage en microsecondes si le sketch d'origine fonctionne déjà ainsi
-- valider les 4 servos un par un
+## Step 2 — Movement engine port
+- keep the original movement logic as close as possible
+- keep the same motion identifiers
+- keep timing and transitions stable
+- do not redesign the gait yet
 
-## Étape 2 — Conserver la machine d'état
+## Step 3 — Child-friendly home screen
+- build a home screen with large icon-based buttons
+- avoid text-heavy navigation
+- validate touch usability with real fingers, not only a stylus
 
-Reprendre à l'identique :
-- `walkAction`
-- `walkCount`
-- `inMotionFlag`
-- séquence de playback
-- timings existants
+## Step 4 — Sequence editor
+- create 8 large movement slots
+- allow one-tap action selection
+- show movement using icons and colors
+- support clear and replay
 
-## Étape 3 — Remplacer les boutons
+## Step 5 — Adult setup pages
+- add calibration
+- add diagnostics
+- add brightness and sound options if used
+- optionally add persistent storage
 
-Ancien système :
-- 4 boutons pour choisir l'action
-- 1 bouton play / programmation
-- 1 bouton reset
+## Step 6 — Final enclosure integration
+- mount the screen where a child can easily reach it
+- secure the wires
+- separate servo power and logic power physically
 
-Nouveau système :
-- boutons tactiles à l'écran
+## Important non-goal
 
-## Étape 4 — Ajouter le stockage
-
-Sur ESP32, ajouter ensuite :
-- sauvegarde de la séquence
-- sauvegarde des offsets
-
-## Architecture logicielle minimale
-
-- `servo_controller.*`
-- `motion_engine.*`
-- `ui_screens.*`
-- `storage.*`
-
-## Bibliothèques typiques
-
-- `ESP32Servo` pour le pilotage servo sur ESP32
-- `TFT_eSPI` ou pile déjà utilisée par ta carte
-- `XPT2046_Touchscreen` ou équivalent selon la carte
-- `Preferences` pour un stockage simple
-
-## Points de vigilance
-
-- ne pas bloquer trop longtemps dans l'UI si les servos doivent rester fluides
-- éviter d'alimenter les servos depuis l'ESP32
-- valider très tôt les GPIO réellement disponibles sur la carte achetée
+Do not make the user interface more complex than the original system.  
+The added screen should make the robot easier to use, not harder.

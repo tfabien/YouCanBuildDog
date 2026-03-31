@@ -1,68 +1,73 @@
-# Hardware
+# Hardware Guide
 
-## Choix retenu
+## Target approach
 
-### Carte principale
-- **ESP32-2432S028**
-- écran TFT 2.8"
-- tactile résistif
-- très économique
-- assez de GPIO pour un petit robot à 4 servos
+This variant intentionally uses the **lowest-cost and simplest architecture**:
 
-Cette famille de cartes existe en plusieurs variantes ; la documentation publique confirme l'intégration d'un écran 2.8", d'un ESP32, et l'exposition d'une partie des GPIO sur connecteurs latéraux/arrière. citeturn912039image1turn912039image8
+- ESP32 touch board
+- servos connected directly to ESP32 GPIO pins
+- no PCA9685
+- external 5V power supply for the servos
 
-## Pourquoi ce choix
+## Recommended board
 
-- moins cher qu'un empilage ESP32 + écran + shield
-- moins de câblage
-- format compact à intégrer sur le robot
-- assez puissant pour gérer l'UI et 4 sorties servo
+A low-cost **ESP32 2.8 inch touch display board** is a good fit because it combines:
+- ESP32
+- color display
+- touch input
+- compact form factor
+- low price
 
-## Alimentation
+## Power rules
 
-### Règle impérative
-Les servos ne doivent pas être alimentés par le 5V logique de la carte ESP32.
+This is the most important part of the build.
 
-### Câblage d'alimentation
-- alimentation externe 5V / 3A minimum
-- +5V alimentation -> fils rouges des 4 servos
-- GND alimentation -> fils noirs des 4 servos
-- GND alimentation -> GND ESP32
+### Do not do this
+- Do **not** power the servos from the ESP32 board
+- Do **not** share high servo current through thin USB-only wiring
 
-Les tutoriels de pilotage servo sur ESP32 recommandent explicitement une alimentation externe pour le ou les servos, avec masse commune. citeturn912039image2turn912039image4
+### Do this
+- Use a dedicated **5V external power supply** for the servos
+- Connect **all servo grounds** to the power supply ground
+- Connect the **ESP32 ground** to the same common ground
+- Send only the **signal wire** from the ESP32 GPIO to each servo
 
-## GPIO proposés
+## Basic wiring concept
 
-> À valider sur la variante exacte de ta carte avant soudure définitive.
+- ESP32 GPIO -> servo signal
+- external 5V -> servo V+
+- external GND -> servo GND
+- external GND -> ESP32 GND
 
-- Servo 1 -> GPIO25
-- Servo 2 -> GPIO27
-- Servo 3 -> GPIO32
-- Servo 4 -> GPIO33
+## Suggested minimal GPIO plan
 
-## Schéma de principe
+Actual available pins depend on the exact display board revision.  
+Treat this as a starting point that must be validated against the board you buy.
 
-![Wiring overview](assets/wiring_overview.png)
+Example idea:
+- Servo 1 -> GPIO 13
+- Servo 2 -> GPIO 14
+- Servo 3 -> GPIO 26
+- Servo 4 -> GPIO 27
 
-## Photos / références visuelles
+Keep the UI and touch pins reserved for the display board itself.
 
-Carte ESP32 tactile typique :  
-- vue produit et format général. citeturn912039image0turn912039image3
+## Stability tips
 
-Exemple de principe de câblage d'un servo sur ESP32 avec alimentation externe :  
-- principe de signal PWM + 5V externe + GND commun. citeturn912039image2turn912039image4
+- add a large capacitor on the servo power rail
+- keep servo power wires short and thick enough
+- keep signal wires away from noisy power loops
+- test one servo first, then two, then all servos
 
-## Liste d'achat minimale
+## Why direct GPIO is acceptable here
 
-- 1 x ESP32-2432S028
-- 4 x servos existants du robot
-- 1 x alimentation 5V 3A minimum
-- fils Dupont / JST selon ton montage
-- 1 x interrupteur général (option recommandé)
-- 1 x condensateur 1000 µF sur l'alimentation servo (recommandé)
+For a small educational robot with only a few servos, direct GPIO is the cheapest option.  
+It is not as robust as using a dedicated servo driver, but it keeps the bill of materials low and the wiring simple.
 
-## Risques connus
+## Child safety and usability
 
-- redémarrages de l'ESP32 si l'alimentation servo est sous-dimensionnée
-- bruit électrique sur les signaux si les masses sont mal câblées
-- conflit possible de GPIO selon la variante exacte de la carte tactile
+Because the interface is meant for children:
+- hide loose wiring as much as possible
+- protect the power input
+- keep moving parts visible but not easy to pinch
+- mount the screen where it can be touched without reaching near the legs

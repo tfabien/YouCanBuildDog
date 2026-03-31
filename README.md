@@ -1,60 +1,51 @@
-# YouCanBuildDog ESP32 Touch
+# YouCanBuildDog ESP32 Touch Fork Plan
 
-Fork-ready bundle to migrate **XRobots/YouCanBuildDog** from Arduino Uno + buttons to **ESP32 tactile + servos branchés directement sur des GPIO PWM**.
+This documentation package describes a **low-cost ESP32 touch replacement** for the original Arduino Uno + buttons user interface.
 
-## Objectif
+## Goal
 
-Conserver la logique simple du projet d'origine (programmation locale d'une petite séquence de mouvements), tout en remplaçant :
+Replace the original button-based programming interface with a **kid-friendly touch interface**:
+- large colorful buttons
+- clear icons
+- minimal text on the main screens
+- advanced text only for setup and calibration
+- no external servo driver board
+- direct servo control from ESP32 GPIO
+- external 5V power supply for servos
 
-- l'Arduino Uno
-- les boutons physiques
-- les LEDs d'état
+## Design principles
 
-par :
+The graphical interface is intentionally designed for children:
+- **big touch targets**
+- **strong color coding**
+- **one icon = one action**
+- **very little text on the main screens**
+- **predictable navigation**
+- **fun but simple visual language**
 
-- une carte **ESP32-2432S028** (écran tactile 2.8")
-- une interface tactile locale
-- un stockage persistant des offsets et de la séquence
+The advanced pages (calibration, setup, diagnostics) may still contain text because they are intended for an adult.
 
-## Ce bundle contient
+## Suggested hardware
 
-- `docs/hardware.md` : choix matériel et branchements
-- `docs/ui.md` : écrans proposés et logique d'usage
-- `docs/migration-plan.md` : plan de portage depuis le sketch d'origine
-- `docs/assets/` : schémas de branchement + maquettes d'interface
+- ESP32-2432S028 or similar low-cost 2.8" ESP32 touch display
+- 4 small servos (or adapt later to 6 if the full original design is kept)
+- external regulated 5V power supply for servos
+- common ground between ESP32 and servo power
 
-## Limites de ce bundle
+## Included documents
 
-Je ne peux pas créer un vrai fork GitHub à ta place depuis ici, ni pousser des commits sur un dépôt distant.
-En revanche, ce dossier est prêt à être utilisé comme base de fork local :
-1. tu crées ton fork GitHub du repo d'origine,
-2. tu ajoutes ce dossier de documentation,
-3. tu portes ensuite le code progressivement.
+- `docs/hardware.md` — wiring and power recommendations
+- `docs/ui.md` — child-friendly user interface proposal
+- `docs/migration-plan.md` — recommended migration steps
+- `docs/assets/` — wiring diagram and screen mockups
 
-## Carte recommandée
+## Important note
 
-- **ESP32-2432S028** ("Cheap Yellow Display")
-- écran 2.8" tactile
-- très bon marché
-- adaptée à une UI locale simple
+This package is a **documentation and design starter**.  
+It does not yet contain the ESP32 firmware implementation.
 
-## Contraintes importantes
-
-- **Servos alimentés par une alimentation 5V externe**
-- **Masse commune obligatoire** entre alimentation servos et ESP32
-- **Ne pas alimenter les servos depuis la carte ESP32**
-
-## Proposition de GPIO
-
-Cette proposition vise la simplicité. Elle devra être validée sur la carte exacte achetée, car certaines variantes réservent des GPIO différents pour l'écran/tactile.
-
-- Servo 1: GPIO25
-- Servo 2: GPIO27
-- Servo 3: GPIO32
-- Servo 4: GPIO33
-
-## Références utiles
-
-- Dépôt d'origine : XRobots/YouCanBuildDog
-- Exemple de carte ESP32-2432S028 et disposition générale des broches. citeturn912039image1turn912039image8
-- Bonnes pratiques d'alimentation de servos avec ESP32 : alimentation externe et masse commune. citeturn912039image2turn912039image4
+The recommended next step is to build:
+1. a minimal ESP32 servo control prototype,
+2. a touch UI with large icon-based actions,
+3. a sequence editor,
+4. optional setup/calibration pages for adults.
