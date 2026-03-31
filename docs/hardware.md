@@ -1,68 +1,115 @@
-# Hardware
+# Hardware Guide
 
-## Choix retenu
+## Selected board
 
-### Carte principale
+For the lowest-cost setup, the recommended board is:
+
 - **ESP32-2432S028**
-- écran TFT 2.8"
-- tactile résistif
-- très économique
-- assez de GPIO pour un petit robot à 4 servos
+- 2.8" color TFT display
+- resistive touch panel
+- integrated ESP32
 
-Cette famille de cartes existe en plusieurs variantes ; la documentation publique confirme l'intégration d'un écran 2.8", d'un ESP32, et l'exposition d'une partie des GPIO sur connecteurs latéraux/arrière. citeturn912039image1turn912039image8
+This board is attractive because it combines:
 
-## Pourquoi ce choix
+- ESP32 microcontroller
+- touch screen
+- compact form factor
+- low price
 
-- moins cher qu'un empilage ESP32 + écran + shield
-- moins de câblage
-- format compact à intégrer sur le robot
-- assez puissant pour gérer l'UI et 4 sorties servo
+## Why direct servo control
 
-## Alimentation
+The goal of this version is to keep the design:
 
-### Règle impérative
-Les servos ne doivent pas être alimentés par le 5V logique de la carte ESP32.
+- cheap
+- simple
+- easy to wire
 
-### Câblage d'alimentation
-- alimentation externe 5V / 3A minimum
-- +5V alimentation -> fils rouges des 4 servos
-- GND alimentation -> fils noirs des 4 servos
-- GND alimentation -> GND ESP32
+For that reason, the servos are connected directly to the ESP32 instead of using a PCA9685 board.
 
-Les tutoriels de pilotage servo sur ESP32 recommandent explicitement une alimentation externe pour le ou les servos, avec masse commune. citeturn912039image2turn912039image4
+## Important power rule
 
-## GPIO proposés
+### Never do this
 
-> À valider sur la variante exacte de ta carte avant soudure définitive.
+- Do not power the servos from the ESP32 5V pin.
+- Do not assume the USB power input can safely power multiple servos.
 
-- Servo 1 -> GPIO25
-- Servo 2 -> GPIO27
-- Servo 3 -> GPIO32
-- Servo 4 -> GPIO33
+### Always do this
 
-## Schéma de principe
+- Use a **separate 5V power supply** for the servos.
+- Connect **all grounds together**:
+  - ESP32 GND
+  - servo power supply GND
+  - servo GND wires
 
-![Wiring overview](assets/wiring_overview.png)
+## Minimal wiring concept
 
-## Photos / références visuelles
+Each servo has 3 wires:
 
-Carte ESP32 tactile typique :  
-- vue produit et format général. citeturn912039image0turn912039image3
+- **GND** -> external 5V power supply GND
+- **V+** -> external 5V power supply +5V
+- **Signal** -> one ESP32 GPIO
 
-Exemple de principe de câblage d'un servo sur ESP32 avec alimentation externe :  
-- principe de signal PWM + 5V externe + GND commun. citeturn912039image2turn912039image4
+The ESP32 must share the same ground reference.
 
-## Liste d'achat minimale
+## Example wiring
 
-- 1 x ESP32-2432S028
-- 4 x servos existants du robot
-- 1 x alimentation 5V 3A minimum
-- fils Dupont / JST selon ton montage
-- 1 x interrupteur général (option recommandé)
-- 1 x condensateur 1000 µF sur l'alimentation servo (recommandé)
+### Power
 
-## Risques connus
+- External 5V power supply -> all servo V+
+- External GND -> all servo GND
+- External GND -> ESP32 GND
 
-- redémarrages de l'ESP32 si l'alimentation servo est sous-dimensionnée
-- bruit électrique sur les signaux si les masses sont mal câblées
-- conflit possible de GPIO selon la variante exacte de la carte tactile
+### Signals
+
+Example GPIO mapping to validate on the exact board revision:
+
+- Servo 1 -> GPIO 26
+- Servo 2 -> GPIO 27
+- Servo 3 -> GPIO 14
+- Servo 4 -> GPIO 13
+
+> Note: this mapping is a starting point only. Some ESP32 display board variants expose different free pins. The exact board revision must be checked before final wiring.
+
+## Current recommendation
+
+For a small 4-servo robot:
+
+- absolute minimum: **5V 3A** power supply
+- safer choice: **5V 4A or 5V** with enough current margin
+
+If you later use 6 servos, use a stronger supply.
+
+## Reliability recommendations
+
+To reduce resets and electrical noise:
+
+- add a **1000 uF capacitor** across servo power rails
+- keep servo power wires short and thick enough
+- keep signal wires separate from noisy power loops if possible
+- power the ESP32 independently from USB during development, or through a stable regulator in the final build
+
+## Mechanical integration idea
+
+A low-cost and practical layout is:
+
+- ESP32 display mounted on top or on the side of the robot base
+- servo power wires routed separately
+- one external power connector for servos
+- one USB connector kept accessible for firmware upload
+
+## Parts list
+
+### Required
+
+- 1 x ESP32-2432S028 touch display board
+- 4 x servos
+- 1 x external 5V power supply
+- jumper wires / Dupont wires
+- common ground connection
+
+### Recommended
+
+- 1 x 1000 uF capacitor
+- 1 x power switch
+- 1 x small terminal block or power distribution point
+

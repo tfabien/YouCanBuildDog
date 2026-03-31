@@ -1,57 +1,124 @@
-# Plan de migration
+# Migration Plan
 
-## Stratégie recommandée
+## Goal
 
-Ne pas réécrire la cinématique au début.  
-Le plus sûr consiste à **conserver la logique métier** du sketch d'origine et à remplacer progressivement l'IHM et la plateforme.
+Move from the original Arduino Uno implementation to an ESP32 touch display board while preserving the original robot behavior as much as possible.
 
-## Étape 1 — Porter le contrôle servo
+## Migration strategy
 
-- remplacer la lib Arduino Uno par une lib ESP32 compatible servo
-- garder le pilotage en microsecondes si le sketch d'origine fonctionne déjà ainsi
-- valider les 4 servos un par un
+The safest approach is incremental.
 
-## Étape 2 — Conserver la machine d'état
+## Step 1 - Port servo control to ESP32
 
-Reprendre à l'identique :
-- `walkAction`
-- `walkCount`
-- `inMotionFlag`
-- séquence de playback
-- timings existants
+Keep the motion logic as close as possible to the original sketch.
 
-## Étape 3 — Remplacer les boutons
+Tasks:
 
-Ancien système :
-- 4 boutons pour choisir l'action
-- 1 bouton play / programmation
-- 1 bouton reset
+- replace the Uno servo library with an ESP32-compatible one
+- confirm PWM output on selected GPIOs
+- validate neutral servo positions
+- keep original timing and motion constants initially unchanged
 
-Nouveau système :
-- boutons tactiles à l'écran
+Expected result:
 
-## Étape 4 — Ajouter le stockage
+- the robot performs the same basic movements as before
 
-Sur ESP32, ajouter ensuite :
-- sauvegarde de la séquence
-- sauvegarde des offsets
+## Step 2 - Replace physical buttons with a software state model
 
-## Architecture logicielle minimale
+Before building the full touch UI, replace direct button reads with internal software commands.
 
-- `servo_controller.*`
-- `motion_engine.*`
-- `ui_screens.*`
-- `storage.*`
+Tasks:
 
-## Bibliothèques typiques
+- convert button-triggered logic into callable actions
+- keep the same sequence model
+- preserve reset and playback behavior
 
-- `ESP32Servo` pour le pilotage servo sur ESP32
-- `TFT_eSPI` ou pile déjà utilisée par ta carte
-- `XPT2046_Touchscreen` ou équivalent selon la carte
-- `Preferences` pour un stockage simple
+Expected result:
 
-## Points de vigilance
+- the robot logic is independent from physical buttons
 
-- ne pas bloquer trop longtemps dans l'UI si les servos doivent rester fluides
-- éviter d'alimenter les servos depuis l'ESP32
-- valider très tôt les GPIO réellement disponibles sur la carte achetée
+## Step 3 - Add the touch screen UI
+
+Tasks:
+
+- implement home screen
+- implement sequence editor
+- implement playback screen
+- implement reset action
+
+Expected result:
+
+- the original programming workflow is now performed on screen
+
+## Step 4 - Add calibration support
+
+Tasks:
+
+- expose servo offsets in a simple UI
+- apply offsets before writing pulse widths
+- verify the robot posture after restart
+
+Expected result:
+
+- easier assembly tuning and maintenance
+
+## Step 5 - Add persistence
+
+Tasks:
+
+- save movement sequence in flash memory
+- save servo offsets in flash memory
+- reload configuration at startup
+
+Expected result:
+
+- the programmed sequence survives reboot or power loss
+
+## What should not change at first
+
+To reduce regression risk, do not change initially:
+
+- motion semantics
+- sequence size
+- action meanings
+- timing constants
+- motion interpolation logic
+
+## Main risks
+
+### Electrical risk
+
+Servo current peaks may reset the ESP32.
+
+Mitigation:
+
+- external servo power supply
+- common ground
+- capacitor on servo rail
+
+### GPIO conflict risk
+
+Some display board pins may already be used internally.
+
+Mitigation:
+
+- confirm the exact board revision
+- test each servo output one by one
+
+### Mechanical risk
+
+Servo offsets may need adjustment after rewiring or rebuild.
+
+Mitigation:
+
+- provide a calibration screen early
+
+## Recommended implementation order
+
+1. Servo test sketch
+2. Minimal motion engine port
+3. Internal software commands
+4. Touch UI
+5. Persistent storage
+6. Final enclosure and cable routing
+

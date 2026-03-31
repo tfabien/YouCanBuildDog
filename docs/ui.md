@@ -1,64 +1,129 @@
-# Interface tactile proposée
+# Touch UI Proposal
 
-L'objectif est de rester **très simple**, sans réinventer la logique du robot d'origine.
+## Design goals
 
-## Écran 1 — Accueil
+The new interface should remain:
 
-Fonctions :
-- Programmer
-- Jouer
-- Calibration
-- Reset séquence
+- simple
+- cheap to implement
+- close to the original project behavior
+- usable without external computer access
 
-Maquette :
-![Accueil](assets/mockup_home.png)
+## Functional idea
 
-## Écran 2 — Programmation
+The original project uses physical buttons to build a short movement sequence.
 
-Principe :
-- 8 slots de séquence
-- chaque slot reçoit une action
-- actions minimales :
-  - Forward
-  - Backward
-  - Left
-  - Right
+The touch version replaces those buttons with on-screen controls while preserving the same behavior:
 
-Maquette :
-![Programmation](assets/mockup_sequence.png)
+- choose an action
+- assign it to a sequence slot
+- replay the sequence
+- reset the sequence
 
-## Écran 3 — Calibration
+## Main screens
 
-Principe :
-- un offset par servo
-- boutons `-` et `+`
-- sauvegarde persistante
+## 1. Home screen
 
-Maquette :
-![Calibration](assets/mockup_calibration.png)
+Purpose:
 
-## Ergonomie visée
+- central entry point
+- quick access to programming and playback
 
-- gros boutons tactiles
-- texte lisible
-- pas de menus complexes
-- pas d'édition libre compliquée
+Suggested buttons:
 
-## Mapping fonctionnel conseillé
+- **Program**
+- **Play**
+- **Calibration**
+- **Reset**
 
-Pour coller au sketch d'origine :
+## 2. Sequence editor screen
 
-- `motion1..motion8` -> 8 cases écran
-- `walkAction` -> action sélectionnée
-- `sw5` (play) -> bouton **Play**
-- `sw6` (reset) -> bouton **Reset**
+Purpose:
 
-## Sauvegarde
+- create or modify a short movement sequence
 
-Deux niveaux possibles :
-- séquence courante seulement
-- séquence courante + offsets
+Suggested layout:
 
-Pour un premier portage, sauvegarder seulement :
-- 8 actions
-- 4 offsets servo
+- 8 numbered slots
+- each slot stores one action
+- action buttons at the bottom
+
+Actions:
+
+- **Forward**
+- **Backward**
+- **Turn Left**
+- **Turn Right**
+
+Suggested interactions:
+
+- tap a slot to select it
+- tap an action to assign it
+- highlight the current slot
+- provide a clear visual label for each stored action
+
+## 3. Playback screen
+
+Purpose:
+
+- run the sequence
+- show progression while the robot moves
+
+Suggested controls:
+
+- **Start**
+- **Stop**
+- **Home**
+
+Suggested indicators:
+
+- current step index
+- current action label
+- running / idle state
+
+## 4. Calibration screen
+
+Purpose:
+
+- adjust servo offsets
+- make leg positioning easier after assembly
+
+Suggested controls:
+
+- Servo 1 offset minus / plus
+- Servo 2 offset minus / plus
+- Servo 3 offset minus / plus
+- Servo 4 offset minus / plus
+- **Save**
+
+## Visual style
+
+Recommended style:
+
+- large buttons
+- high contrast labels
+- simple colors
+- no complex animations
+- readable while standing near the robot
+
+## UX recommendations
+
+To keep the UI robust:
+
+- avoid tiny touch targets
+- avoid deep menus
+- make the most common actions reachable in one tap
+- show explicit labels instead of icons only
+- keep the sequence length fixed at first
+
+## Future improvements
+
+Possible later improvements:
+
+- more than 8 sequence steps
+- named sequences
+- save/load multiple programs
+- speed adjustment
+- manual servo positioning screen
+- Wi-Fi export/import
+
